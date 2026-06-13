@@ -1,0 +1,22 @@
+{
+  "name": "pulsecrm-backend",
+  "version": "1.0.0",
+  "description": "PulseCRM — AI-native Mini CRM for Arora Roast (Xeno Take-Home)",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch server.js",
+    "start": "node server.js",
+    "seed": "node seed.js",
+    "setup": "node seed.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "bullmq": "^5.78.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "ioredis": "^5.11.1",
+    "mongoose": "^8.3.0",
+    "socket.io": "^4.8.1"
+  }
+}

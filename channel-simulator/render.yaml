@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: pulsecrm-channel
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: CRM_WEBHOOK_URL
+        sync: false
