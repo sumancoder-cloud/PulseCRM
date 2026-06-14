@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import router from './routes/index.js';
 import { connectDB } from './config/db.js';
 import { initRealtime } from './realtime.js';
+import { seedDatabase } from './seed.js';
 
 dotenv.config();
 
@@ -19,6 +20,13 @@ const httpServer = http.createServer(app);
 
 // Connect Database
 await connectDB();
+
+// Auto-seed database if empty (first time deployment)
+try {
+  await seedDatabase();
+} catch (error) {
+  console.warn('⚠️  Seeding skipped or already seeded:', error.message);
+}
 
 // Initialize WebSocket
 initRealtime(httpServer);

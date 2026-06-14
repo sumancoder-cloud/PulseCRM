@@ -36,6 +36,13 @@ async function main() {
 
   await connectDB();
 
+  // Check if data already exists (don't re-seed)
+  const existingCount = await Customer.countDocuments();
+  if (existingCount > 0) {
+    console.log(`✓ Database already has ${existingCount} customers — skipping seed`);
+    return;
+  }
+
   // Clear collections
   await CommunicationEvent.deleteMany({});
   await Communication.deleteMany({});
@@ -126,11 +133,24 @@ async function main() {
   console.log('✅ Seed complete — Arora Roast MongoDB data ready!');
 }
 
-main()
-  .catch((e) => {
-    console.error('❌ Seeding failed:', e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await mongoose.disconnect();
-  });
+// Export for use in server.js
+export async function seedDatabase() {
+  try {
+    await main();
+  } catch (e) {
+    console.error('❌ Seeding failed:', e.message);
+    throw e;
+  }
+}
+
+// If run directly: node seed.js
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main()
+    .catch((e) => {
+      console.error('❌ Seeding failed:', e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await mongoose.disconnect();
+    });
+}
