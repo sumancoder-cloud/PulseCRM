@@ -50,8 +50,14 @@ async function dispatchToChannel(job) {
     // Simulate delivery status with random outcomes
     const rand = Math.random();
     let deliveryStatus = 'DELIVERED';
-    if (rand < 0.1) deliveryStatus = 'READ';
-    if (rand < 0.05) deliveryStatus = 'CLICKED';
+    if (rand < 0.05) {
+      deliveryStatus = 'CLICKED';  // 5% clicked
+    } else if (rand < 0.15) {
+      deliveryStatus = 'READ';     // 10% read
+    } else if (rand < 0.25) {
+      deliveryStatus = 'OPENED';   // 10% opened
+    }
+    // Rest 65% = DELIVERED
 
     await Communication.findByIdAndUpdate(communicationId, {
       status: deliveryStatus,
