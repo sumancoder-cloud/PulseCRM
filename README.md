@@ -1,151 +1,98 @@
-# 🚀 Mini CRM – AI‑Native Customer Engagement Platform
+# PulseCRM – AI‑Native Mini CRM
 
-**Mini CRM** is an intelligent marketing platform that enables brands to reach shoppers through AI‑driven segmentation, personalized messaging, and multi‑channel campaigns.
+![MIT License](https://img.shields.io/badge/License-MIT-green.svg) ![Node.js](https://img.shields.io/badge/Node.js-22%2B-blue.svg)
 
----
-
-## 📚 Quick Overview
-
-- **AI Copilot**: Turn natural‑language prompts into shopper segments, campaign messages, and optimal channel recommendations using Gemini (or a heuristic fallback).
-- **Shopper Vitals (RFM)**: Recency‑Frequency‑Monetary scoring automatically groups shoppers into **Champions, Loyal, At‑Risk, Hibernating, New**.
-- **Channel Simulator**: A lightweight service that mimics real‑world delivery pipelines (WhatsApp, SMS, Email, RCS) with async webhook callbacks for **SENT → DELIVERED → READ → OPENED → CLICKED → ORDER_ATTRIBUTED**.
-- **Attribution Loop**: Clicked messages can trigger simulated orders that flow back into the CRM for closed‑loop analytics.
-- **Dynamic Discounts**: AI can suggest discount values (e.g., 15 %) that are applied per‑campaign.
+## 📢 Overview
+**PulseCRM** is an AI‑native mini‑CRM built for the Xeno SDE Internship assignment. It helps a fictional premium coffee brand **Arora Roast** intelligently reach its shoppers using a **Campaign Copilot**. Marketers type a natural‑language goal, the AI proposes the right audience, crafts a message, picks the optimal channel, and suggests a discount. The human stays in full control and can customize before launch.
 
 ---
 
-## 🏗️ Architecture Diagram
-
-![Mini CRM Architecture](file:///C:/Users/user/.gemini/antigravity-ide/brain/f7bc9903-bbdc-459d-9b8e-8a33c94e7e1c/mini_crm_architecture_1781373090790.png)
-
----
-
-## ⚙️ System Components
-
-| Component | Tech Stack | Purpose |
-|-----------|------------|---------|
-| **Frontend** | React + Vite | Interactive UI for campaign creation, shopper insights, and live dashboard |
-| **Backend API** | Node.js (Express) + Mongoose (MongoDB) | Business logic, AI integration, campaign orchestration |
-| **Channel Simulator** | Node.js (Express) | Mock external channels, emit async webhook events |
-| **Queue** | BullMQ (in‑memory fallback) | Reliable background processing of campaigns |
-| **Database** | MongoDB (local / Atlas) | Persist shoppers, segments, campaigns, events |
+## 🖥️ Live Demo Flow (5 min walkthrough)
+1. **AI Copilot** – type a goal such as *“Re‑engage shoppers who haven’t ordered in 60 days with a 15 % discount.”*
+2. **Audience diagnosis** – AI returns the **At‑Risk** segment with shopper vitals.
+3. **Message & channel** – AI suggests WhatsApp + 15 % discount; preview updates instantly.
+4. **Campaign customizer** – adjust discount or channel, see live preview.
+5. **Launch** – campaign is queued; the **Live Campaigns** dashboard shows the funnel updating in real time (SENT → DELIVERED → READ → OPENED → CLICKED → ORDER_ATTRIBUTED).
+6. Quick glance at **Shopper Vitals** (RFM scores) and the **Add Data** tab.
 
 ---
 
-## 🚀 Local Development
+## 🏗️ System Architecture
+![PulseCRM Architecture Diagram](file:///C:/Users/user/.gemini/antigravity-ide/brain/6a52fc4d-f346-4022-9003-170b61f88170/pulsecrm_architecture_image_1781483679551.png)
 
-### Prerequisites
-- Node.js ≥ 18
-- npm
-- (Optional) MongoDB instance (local or Atlas)
+### Data Flow Diagram
+![Data Flow Diagram](file:///C:/Users/user/.gemini/antigravity-ide/brain/6a52fc4d-f346-4022-9003-170b61f88170/pulsecrm_data_flow_1781459125129.png)
 
-### 1. Backend
-```bash
-cd crm-backend
-npm install
-# Seed demo shopper data
-npm run setup
-# Start the API (http://localhost:5000)
-npm run dev
-```
-
-### 2. Channel Simulator (in a separate terminal)
-```bash
-cd channel-simulator
-npm install
-npm start   # http://localhost:5001
-```
-
-### 3. Frontend (in a third terminal)
-```bash
-cd crm-frontend
-npm install
-npm run dev   # http://localhost:5173
-```
-
-### 4. Enable Gemini AI (optional)
-Create a `.env` file in `crm-backend/`:
-```dotenv
-GEMINI_API_KEY=YOUR_GEMINI_KEY
-```
-If the key is missing, the service falls back to deterministic heuristics.
+> **Architecture diagram** – see the image generated for the walkthrough: ![Architecture](file:///C:/Users/user/.gemini/antigravity-ide/brain/6a52fc4d-f346-4022-9003-170b61f88170/pulsecrm_architecture_1781458801362.png)
 
 ---
 
-## 📡 API Reference
-| Method | Path | Description |
-|--------|------|-------------|
-| **GET** | `/api/health` | Health check |
-| **GET** | `/api/vitals` | Summary of RFM shopper vitals |
-| **GET** | `/api/dashboard` | Overview of campaigns & vitals |
-| **POST** | `/api/ai/segment` | Generate segment rules from natural language |
-| **POST** | `/api/ai/campaign` | Generate message + channel recommendation |
-| **POST** | `/api/segments` | Persist a new segment |
-| **POST** | `/api/campaigns/launch` | Launch a prepared campaign |
-| **POST** | `/api/webhooks/channel` | Receive async channel callbacks |
-| **GET** | `/api/campaigns/:id` | Campaign details + event timeline |
-
----
-
-## 📦 Deployment Guide
-### Backend → Render / Railway / Render
-```bash
-# Build step
-echo "npm install"
-# Start command
-npm start
-```
-Set environment variables:
-- `MONGODB_URI`
-- `CHANNEL_SERVICE_URL`
-- `GEMINI_API_KEY` (optional)
-- `WEBHOOK_URL` (URL of your backend for the simulator to call)
-
-### Frontend → Vercel / Netlify
-```bash
-cd crm-frontend
-# Set API endpoint for production
-export VITE_API_URL=https://your-backend.com/api
-vercel --prod
-```
-
-### Channel Simulator → Render (or keep local for demo)
-Provide `CRM_WEBHOOK_URL` env var pointing to the deployed backend webhook endpoint.
-
----
-
-## 🛠️ Trade‑offs & Future Work
-| Decision | Reason | Potential Improvement |
-|----------|--------|-----------------------|
-| **MongoDB** for schema flexibility | Simple document model for shopper data | Sharded cluster for high‑scale multi‑tenant |
-| **In‑memory queue fallback** | No external Redis required for demo | Dedicated Redis for durability |
-| **Single‑brand demo** | Keeps scope manageable for internship | Multi‑tenant auth & brand isolation |
-| **Heuristic AI fallback** | Guarantees functionality without API key | Fine‑tuned Gemini model for better copy |
-
----
-
-## 📁 Repository Layout
+## 📂 Repository Layout
 ```
 MiniCRM/
-├─ .git/                # Git history
-├─ .gitignore           # Ignored files (see below)
-├─ README.md            # **You are here**
-├─ channel-simulator/   # Mock channel service
-├─ crm-backend/         # Express API
-├─ crm-frontend/        # React UI (Vite)
-└─ guides/              # Helpful docs / scripts (clean_repo.ps1, etc.)
+├─ crm-frontend/      # React + Vite UI
+│   └─ src/...       
+├─ crm-backend/       # Express API, Mongoose models, services
+│   ├─ models/        # Customer, Order, Campaign, etc.
+│   ├─ controllers/   # AI, Campaign, Webhook, RFM
+│   ├─ services/      # aiService.js, rfmService.js, statsService.js
+│   └─ queue.js       # BullMQ / fallback queue
+├─ channel-simulator/ # Mock external channels, async webhook lifecycle
+│   └─ server.js
+├─ docs/              # Architecture & data‑flow images
+│   ├─ pulsecrm_architecture_*.png
+│   └─ pulsecrm_data_flow_*.png
+└─ README.md          # (this file)
 ```
 
 ---
 
-## 📃 Guides (Optional)
-The `guides/` folder contains utility scripts used during development (e.g., `clean_repo.ps1`). They are ignored by Git by default.
+## 🤖 AI Integration & Fallback
+- **Gemini 2.0 Flash** powers segment interpretation and message generation.
+- **Graceful degradation** – if the Gemini API key is missing or rate‑limited, `services/aiService.js` falls back to a deterministic heuristic (keyword matching + simple templates) so the demo never breaks.
+- **Two‑service callback loop** – the backend posts webhook events to the channel simulator, which replies with status updates; the backend then forwards them back to the frontend via Socket.IO.
 
 ---
 
-## 📜 Author & License
-**Built for the Xeno SDE Internship Drive 2026**
+## 📈 Trade‑offs (quick table)
+| Decision | Reason | At‑scale alternative |
+|---|---|---|
+| **MongoDB** | Flexible document model for campaigns & communications | Sharded cluster with replicas |
+| **In‑memory queue** | Zero‑dependency demo | Dedicated Redis + BullMQ |
+| **Single‑brand focus** | Manageable scope, deep AI iteration | Multi‑tenant architecture with JWT auth |
+| **Heuristic fallback** | Works without API key | Fine‑tuned Gemini model + caching |
+| **On‑the‑fly RFM** | Fresh scores for demo | Nightly batch job, cache in Redis |
 
 ---
 
-*Feel free to open an issue or submit a PR for enhancements!*
+## 🚀 Getting Started
+```bash
+# Clone the repo
+git clone <YOUR_GITHUB_URL>
+cd MiniCRM
+
+# Install dependencies (backend & frontend)
+npm install          # installs root + workspace packages
+
+# Set up env (copy example files)
+cp crm-backend/.env.example crm-backend/.env
+cp channel-simulator/.env.example channel-simulator/.env
+
+# Start services (in separate terminals)
+# Backend API
+npm run dev --workspace=crm-backend
+# Frontend UI
+npm run dev --workspace=crm-frontend
+# Channel simulator
+npm run dev --workspace=channel-simulator
+```
+Open `http://localhost:5173` (Vite) and follow the demo flow described above.
+
+---
+
+## 🎬 Video Walkthrough
+The 5‑minute walkthrough script is included in the repository under `docs/video_transcript_final.md`. Use it as a teleprompter while recording.
+
+---
+
+*Prepared by **Tati Suman Yadav** for the Xeno SDE Internship – June 2026.*
